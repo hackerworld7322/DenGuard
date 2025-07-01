@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudySync</title>
+    <title>Denguard</title>
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -21,30 +21,19 @@
     <!-- Hero Banner -->
     <div class="banner">
         <div class="banner-content">
-            <h1>StudySync</h1>
-            <p>Smarter Study Grouping with AI</p>
+            <p>Welcome to</p>
+            <h1>Denguard</h1>
+            
         </div>
     </div>
 
     <!-- Upload Section -->
     <div class="container">
-        <h2>Upload Student CSV</h2>
-        <p>Upload a CSV file to auto-generate optimized study groups.</p>
-        <div class="upload-wrapper">
-            <form id="upload-form" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <label for="file-upload" class="upload-box">
-                    <div class="upload-icon">📁</div>
-                    <p class="upload-text">Drag & Drop your CSV here or <span class="upload-browse">Browse</span></p>
-                    <input id="file-upload" name="csv_file" type="file" accept=".csv" required>
-                </label>
-                <button type="submit" class="analyze-btn">Analyze</button>
-            </form>            
-        </div>          
+        
         
         <!-- Result Section -->
         <div id="result-section" {% if result_data %}style="display:block"{% else %}class="hidden"{% endif %}>
-            <h3>📊 Grouping Result</h3>
+            <h3>📊 Result</h3>
             <div class="result-content">
                 {% if result_data %}
                     <form method="post" action="{% url 'export_csv' %}">
@@ -78,7 +67,7 @@
                     <button id="saveChartBtn" class="export-btn">🖼️ Save Chart as PNG</button>
                     
                 {% else %}
-                    <p>Results will be shown here after analysis.</p>
+                    <p>Results will be shown here...</p>
                 {% endif %}
             </div>
         </div>

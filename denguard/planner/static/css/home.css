@@ -42,11 +42,12 @@ body {
 
 .banner-content h1 {
     font-size: 50px;
-    margin-bottom: 10px;
+    margin-bottom: 7px;
 }
 
 .banner-content p {
-    font-size: 18px;
+    font-size: 22px;
+    margin-bottom: 1px;
 }
 
 .upload-wrapper {
