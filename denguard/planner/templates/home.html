@@ -1,0 +1,137 @@
+{% load static %}
+{% include "header.html" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    {% if error %}
+        <div class="error-box">
+            <strong>Error:</strong> {{ error }}
+        </div>
+    {% endif %}
+
+    <!-- Hero Banner -->
+    <div class="banner">
+        <div class="banner-content">
+            <h1>StudySync</h1>
+            <p>Smarter Study Grouping with AI</p>
+        </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="container">
+        <h2>Upload Student CSV</h2>
+        <p>Upload a CSV file to auto-generate optimized study groups.</p>
+        <div class="upload-wrapper">
+            <form id="upload-form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="file-upload" class="upload-box">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">Drag & Drop your CSV here or <span class="upload-browse">Browse</span></p>
+                    <input id="file-upload" name="csv_file" type="file" accept=".csv" required>
+                </label>
+                <button type="submit" class="analyze-btn">Analyze</button>
+            </form>            
+        </div>          
+        
+        <!-- Result Section -->
+        <div id="result-section" {% if result_data %}style="display:block"{% else %}class="hidden"{% endif %}>
+            <h3>📊 Grouping Result</h3>
+            <div class="result-content">
+                {% if result_data %}
+                    <form method="post" action="{% url 'export_csv' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="export-btn">⬇️ Export as CSV</button>
+                    </form>
+                    <table>
+                        <thead>
+                            <tr>
+                                {% for col in result_data.0.keys %}
+                                <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in result_data %}
+                            <tr>
+                                {% for val in row.values %}
+                                <td>{{ val }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <h2>Visualization on Pie Chart</h2>
+                    <p>This chart visualizes the distribution of study groups based on the uploaded data.</p>
+                    <div class="chart-container">
+                        <canvas id="clusterPieChart"></canvas>
+                    </div>
+                    <button id="saveChartBtn" class="export-btn">🖼️ Save Chart as PNG</button>
+                    
+                {% else %}
+                    <p>Results will be shown here after analysis.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+
+    {% if cluster_counts_json %}
+        <script>
+            const ctx = document.getElementById('clusterPieChart').getContext('2d');
+        
+            const clusterCounts = {{ cluster_counts_json|safe }};
+            const labels = Object.keys(clusterCounts);
+            const dataValues = Object.values(clusterCounts);
+        
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Cluster Distribution',
+                    data: dataValues,
+                    backgroundColor: ['#f94144', '#f3722c', '#90be6d', '#577590', '#277da1'],
+                    borderWidth: 1
+                }]
+            };
+        
+            const config = {
+                type: 'pie',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            };
+        
+            const myChart = new Chart(ctx, config);
+        
+            // 🖼️ Save as PNG Handler
+            document.getElementById('saveChartBtn').addEventListener('click', function() {
+                const link = document.createElement('a');
+                link.href = myChart.toBase64Image();
+                link.download = 'cluster_distribution.png';
+                link.click();
+            });
+        </script>
+    
+        {% endif %}
+
+
+
+</body>
+</html>
+
+{% include "footer.html" %}
